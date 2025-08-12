@@ -1,0 +1,998 @@
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  background: #f6f7f9;
+  font-family: 'Avenir', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sheet {
+  position: relative;
+  width: 82vw;
+  height: 78vh;
+  max-width: 400px;
+  max-height: 740px;
+  min-width: 300px;
+  min-height: 420px;
+  background: rgba(233,236,239,0.7);
+  border-radius: 54px;
+  /* Prevent backdrop-filter bleed outside rounded corners in iOS Safari */
+  -webkit-mask-image: -webkit-radial-gradient(white, white);
+  mask-image: radial-gradient(white, white);
+  /* border: 10px solid #bfc2c7; */
+  box-sizing: border-box;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  box-shadow: 0 16px 48px 0 rgba(31, 38, 135, 0.18), 0 2px 24px 0 rgba(0,0,0,0.10), 0 1.5px 8px 0 rgba(255,255,255,0.18) inset;
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  aspect-ratio: 9/19.5;
+}
+
+.model-viewer-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  border-radius: 54px;
+  overflow: hidden; /* Clip internal canvas to respect rounded corners */
+  /* Extra clipping to force Shadow-DOM canvas to respect rounded corners */
+  -webkit-clip-path: inset(0 round 54px);
+  clip-path: inset(0 round 54px);
+  background: transparent;
+}
+
+.info-card {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: 0 18px 18px 18px;
+  transform: none;
+  width: auto;
+  height: 46%;
+  min-height: 160px;
+  max-height: 320px;
+  background: rgba(255,255,255,0.38);
+  border-radius: 36px 36px 44px 44px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 1.5px 8px 0 rgba(255,255,255,0.25) inset;
+  padding: 0 24px 18px 24px;
+  text-align: center;
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 2px solid rgba(255,255,255,0.35);
+}
+
+.info-content {
+  width: 100%;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding-top: 44px;
+  padding-bottom: 24px;
+}
+
+.info-content h2, .info-content p {
+  margin: 0;
+  color: #222;
+  font-family: 'Avenir', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 1.18rem;
+  font-weight: 400;
+  line-height: 1.3;
+  letter-spacing: 0.01em;
+}
+
+.info-content h2 {
+  font-weight: 400;
+  margin-bottom: 8px;
+  letter-spacing: 0.02em;
+}
+
+.info-content p {
+  color: #555;
+  font-size: 1.05rem;
+  font-weight: 400;
+}
+
+.ar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 48px;
+  border: none;
+  border-radius: 54px;
+  /* --- Glassmorphism tone inspired by iOS folder --- */
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(30px) saturate(160%) brightness(1.02);
+  -webkit-backdrop-filter: blur(30px) saturate(160%) brightness(1.02);
+  border: 1px solid rgba(255,255,255,0.38);
+  box-shadow:
+    0 0 4px 0.5px rgba(255,255,255,0.45), /* suave halo exterior */
+    0 0 2px 0.5px rgba(255,255,255,0.10) inset, /* sombra interna ligera */
+    0 1px 0 0 rgba(255,255,255,0.35) inset, /* reflejo superior */
+    0 8px 16px 0 rgba(0,0,0,0.08); /* sombra de profundidad */
+  color: #4a56c6;
+  font-size: 1.18rem;
+  font-family: 'Avenir', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 3;
+  margin: 0 auto; /* Center horizontally via parent flexbox */
+  position: relative; /* Default positioning */
+  transform: none;
+  height: 66px;
+  min-width: 220px;
+  max-width: 100%;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: visible;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.ar-button:hover {
+  background: rgba(255,255,255,0.20);
+  transform: scale(1.025);
+  box-shadow:
+    0 0 24px 2px rgba(255,255,255,0.85), /* glow exterior más intenso */
+    0 0 10px 2px rgba(255,255,255,0.30) inset, /* sombra interna prominente */
+    0 3px 0 0 rgba(255,255,255,0.55) inset, /* reflejo superior intenso */
+    0 20px 40px 0 rgba(0,0,0,0.14), /* sombra de profundidad marcada */
+    0 0 0 1px rgba(255,255,255,0.35) inset; /* borde interno más visible */
+}
+
+.ar-button span {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.ar-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ar-icon svg rect,
+.ar-icon svg circle {
+  stroke: #4a56c6 !important;
+}
+
+/* Ocultar barra de progreso nativa */
+model-viewer::part(default-progress-bar) {
+  display: none !important;
+}
+/* Ocultar botón AR nativo (cubo) de <model-viewer> */
+model-viewer::part(default-ar-button) {
+  display: none !important;
+}
+
+.model-viewer-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 18px;
+  background: rgba(37,99,235,0.85);
+  border-radius: 18px;
+  box-shadow: 0 2px 16px 0 rgba(37,99,235,0.18), 0 1.5px 8px 0 rgba(255,255,255,0.18) inset;
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  display: none;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.custom-loader::before {
+  content: '';
+  display: block;
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.45) 100%);
+  border-radius: 18px;
+  animation: loader-bar 1.2s infinite cubic-bezier(.4,0,.2,1);
+}
+
+@keyframes loader-bar {
+  0% { width: 0%; }
+  50% { width: 100%; }
+  100% { width: 0%; }
+}
+
+/* --- Animación para ocultar/mostrar card y botón --- */
+.info-card, .ar-button {
+  transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out, visibility 0.3s;
+}
+.hide-ui {
+  transform: translateY(120%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- Profundidad 3D en la card del modelo 3D --- */
+.sheet {
+  box-shadow:
+    0 8px 32px 0 rgba(31,38,135,0.18),
+    0 2px 24px 0 rgba(0,0,0,0.10),
+    0 1.5px 8px 0 rgba(255,255,255,0.18) inset,
+    0 24px 48px 0 rgba(37,99,235,0.10),
+    0 0.5px 0.5px 0 rgba(255,255,255,0.10) inset;
+  background: linear-gradient(145deg, rgba(233,236,239,0.85) 60%, rgba(200,220,255,0.13) 100%);
+}
+
+/* --- Borde gradiente animado sutil para el botón de RA --- */
+.ar-button {
+  position: relative;
+  z-index: 3;
+  overflow: visible;
+}
+.ar-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 54px;
+  z-index: -2; /* move further back, we will place ::after on -1 */
+  /* Neutro — frosted glass light streak */
+  background: linear-gradient(135deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.20) 100%);
+  filter: blur(4px) brightness(1.15) saturate(1.1);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+/* --- NEW subtle highlight border overlay --- */
+.ar-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 54px;
+  z-index: -1; /* sits above ::before but below content */
+  border: 1px solid rgba(255,255,255,0.55);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Ajuste para que el contenido del botón esté por encima del borde animado */
+.ar-button > * {
+  position: relative;
+  z-index: 1;
+}
+
+.info-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  text-align: center;
+  padding: 18px 0 24px 0;
+  height: 100%;
+}
+
+.info-text {
+  width: 100%;
+  padding: 0 12px;
+}
+
+.info-actions {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0;
+}
+
+.ar-button.hide-ui {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+}
+
+/* Ensure parent flex container pushes actions to bottom */
+.info-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: auto; /* Push to bottom of info-card */
+}
+
+/* --- Ajuste tipográfico para .info-text --- */
+.info-text h2 {
+  font-weight: 450; /* peso solicitado */
+}
+
+/* === Glow / highlight border for the main card (same effect as .ar-button) === */
+.sheet::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  /* Soft glow similar to the button */
+  background: linear-gradient(135deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.20) 100%);
+  filter: blur(6px) brightness(1.15) saturate(1.1);
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: -2; /* Behind ::after but above base backdrop */
+}
+
+.sheet::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255,255,255,0.55);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: -1; /* Sits between ::before glow and content */
+}
+
+/* === Overlay y FABs para AR en Android =============================== */
+.ar-overlay {
+  position: fixed;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center; /* centrado horizontal */
+  gap: 24px; /* separación entre botones */
+  pointer-events: none; /* hijos manejan eventos */
+  z-index: 10000;
+  /* Debug: hacer visible temporalmente */
+  background: rgba(255, 0, 0, 0.1);
+  border: 2px solid red;
+}
+.ar-fab {
+  pointer-events: auto;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(30px) saturate(160%) brightness(1.02);
+  -webkit-backdrop-filter: blur(30px) saturate(160%) brightness(1.02);
+  border: 1px solid rgba(255,255,255,0.38);
+  box-shadow:
+    0 0 4px 0.5px rgba(255,255,255,0.45),
+    0 0 2px 0.5px rgba(255,255,255,0.10) inset,
+    0 1px 0 0 rgba(255,255,255,0.35) inset,
+    0 8px 16px 0 rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: rgba(255,255,255,0.9);
+}
+
+.ar-fab:hover {
+  transform: scale(1.1);
+  background: rgba(255,255,255,0.18);
+  box-shadow:
+    0 0 8px 1px rgba(255,255,255,0.55),
+    0 0 4px 1px rgba(255,255,255,0.15) inset,
+    0 2px 0 0 rgba(255,255,255,0.45) inset,
+    0 12px 24px 0 rgba(0,0,0,0.12);
+}
+
+.ar-fab:active {
+  transform: scale(0.95);
+}
+
+#ar-info-btn,
+#ar-wa-btn {
+  position: relative; /* se dejará el flujo flex */
+}
+
+/* === Botones de acción para AR (WebXR Only) =============================== */
+#ar-actions {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 20;
+}
+
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  border-radius: 50%;
+  color: #1a1a1a;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  pointer-events: auto;
+}
+
+.action-button:hover {
+  transform: scale(1.1);
+  background: rgba(255, 255, 255, 0.75);
+}
+
+/* Ocultar los botones cuando NO está en AR */
+model-viewer:not([ar-status="session-started"]):not([ar-status="object-placed"]) #ar-actions {
+  display: none;
+}
+
+/* Ocultar la info card cuando está en AR */
+model-viewer[ar-status="session-started"], model-viewer[ar-status="object-placed"] ~ .info-card {
+  display: none;
+}
+
+/* === Modal de información para AR =============================== */
+#info-modal {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+  transition: visibility 0s 0.3s, opacity 0.3s;
+  pointer-events: auto;
+}
+
+#info-modal.show {
+  visibility: visible;
+  opacity: 1;
+  transition: visibility 0s 0s, opacity 0.3s;
+  pointer-events: auto;
+}
+
+.modal-content {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.15);
+  width: 85%;
+  max-width: 380px;
+  position: relative;
+  transform: scale(0.95);
+  transition: transform 0.3s;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+#info-modal.show .modal-content {
+  transform: scale(1);
+}
+
+.modal-content h3 {
+  margin: 0 0 15px 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #1a1a1a;
+}
+
+.modal-content p {
+  margin: 0 0 15px 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #333;
+}
+
+.modal-content ul {
+  margin: 0 0 15px 0;
+  padding-left: 20px;
+}
+
+.modal-content li {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 30px;
+  height: 30px;
+  font-size: 20px;
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  pointer-events: auto;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s;
+}
+
+.modal-close:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+/* =============================================================== */
+
+@media (max-width: 600px) {
+  .sheet {
+    width: 97vw;
+    height: 88vh;
+    min-width: unset;
+    min-height: unset;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-radius: 32px;
+    -webkit-mask-image: -webkit-radial-gradient(white, white);
+    mask-image: radial-gradient(white, white);
+    /* border-width: 6px; */
+    aspect-ratio: 9/19.5;
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 1.5px 8px 0 rgba(255,255,255,0.18) inset, 0 8px 32px 0 rgba(0,0,0,0.10);
+  }
+  .model-viewer-bg {
+    border-radius: 32px;
+    -webkit-clip-path: inset(0 round 32px);
+    clip-path: inset(0 round 32px);
+  }
+  .info-card {
+    border-radius: 18px 18px 24px 24px;
+    width: auto;
+    left: 0;
+    right: 0;
+    margin: 0 8px 8px 8px;
+    height: 50%;
+    min-height: 120px;
+    max-height: 220px;
+    padding: 0 8px 10px 8px;
+    bottom: 0;
+    box-shadow: 0 6px 24px 0 rgba(31, 38, 135, 0.16), 0 1px 6px 0 rgba(255,255,255,0.18) inset;
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+  }
+  .info-content {
+    padding-top: 28px;
+    padding-bottom: 14px;
+  }
+  .ar-button {
+    padding: 0 28px;
+    font-size: 1.01rem;
+    height: 54px;
+    min-width: 220px;
+    max-width: 98vw;
+  }
+  .ar-button {
+    min-width: 300px;
+    max-width: 100vw;
+    padding: 0 12px;
+  }
+  .custom-loader {
+    width: 80px;
+    height: 12px;
+    border-radius: 10px;
+  }
+  .custom-loader::before {
+    border-radius: 10px;
+  }
+} 
+
+/* ================= Botón de Contacto ================= */
+.contact-button-container {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  z-index: 100;
+}
+
+.contact-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border: none;
+  border-radius: 50%;
+  /* Glassmorphism igual que el botón AR */
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(30px) saturate(160%) brightness(1.02);
+  -webkit-backdrop-filter: blur(30px) saturate(160%) brightness(1.02);
+  border: 1px solid rgba(255,255,255,0.38);
+  box-shadow:
+    0 0 4px 0.5px rgba(255,255,255,0.45),
+    0 0 2px 0.5px rgba(255,255,255,0.10) inset,
+    0 1px 0 0 rgba(255,255,255,0.35) inset,
+    0 8px 16px 0 rgba(0,0,0,0.08);
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  position: relative;
+  overflow: visible;
+}
+
+.contact-button:hover {
+  background: rgba(255,255,255,0.20);
+  transform: scale(1.025);
+  box-shadow:
+    0 0 24px 2px rgba(255,255,255,0.85),
+    0 0 10px 2px rgba(255,255,255,0.30) inset,
+    0 3px 0 0 rgba(255,255,255,0.55) inset,
+    0 20px 40px 0 rgba(0,0,0,0.14),
+    0 0 0 1px rgba(255,255,255,0.35) inset;
+}
+
+.contact-button:active {
+  transform: scale(0.95);
+}
+
+/* Efectos de borde animado similar al botón AR */
+.contact-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: -2;
+  background: linear-gradient(135deg, rgba(255,255,255,0.70) 0%, rgba(255,255,255,0.20) 100%);
+  filter: blur(4px) brightness(1.15) saturate(1.1);
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.contact-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: -1;
+  border: 1px solid rgba(255,255,255,0.55);
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* Menú desplegable */
+.contact-menu {
+  position: absolute;
+  top: 74px;
+  left: 0;
+  min-width: 180px;
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+  -webkit-backdrop-filter: blur(32px) saturate(180%) brightness(1.05);
+  border: 1px solid rgba(255,255,255,0.45);
+  border-radius: 20px;
+  padding: 8px;
+  box-shadow:
+    0 8px 32px 0 rgba(31, 38, 135, 0.18),
+    0 2px 24px 0 rgba(0,0,0,0.10),
+    0 1.5px 8px 0 rgba(255,255,255,0.25) inset,
+    0 16px 32px 0 rgba(0,0,0,0.12);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px) scale(0.95);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 99;
+}
+
+.contact-menu.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+}
+
+.contact-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #333;
+  font-family: 'Avenir', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-size: 0.95rem;
+  font-weight: 450;
+  letter-spacing: 0.01em;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.contact-option:hover {
+  background: rgba(255,255,255,0.25);
+  transform: translateX(2px);
+  box-shadow: 0 4px 16px 0 rgba(0,0,0,0.08);
+}
+
+.contact-option:active {
+  transform: scale(0.98) translateX(2px);
+}
+
+.contact-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.contact-icon svg {
+  transition: transform 0.15s ease;
+}
+
+.contact-option:hover .contact-icon svg {
+  transform: scale(1.1);
+}
+
+/* Animación sutil de gradiente para el menú */
+.contact-menu::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: -2;
+  background: linear-gradient(135deg, rgba(255,255,255,0.60) 0%, rgba(255,255,255,0.15) 100%);
+  filter: blur(6px) brightness(1.15) saturate(1.1);
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.contact-menu::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid rgba(255,255,255,0.45);
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .contact-button-container {
+    top: 12px;
+    left: 12px;
+  }
+  
+  .contact-button {
+    width: 53px;
+    height: 53px;
+  }
+  
+  .contact-menu {
+    top: 67px;
+    min-width: 160px;
+    padding: 6px;
+  }
+  
+  .contact-option {
+    padding: 10px 14px;
+    font-size: 0.9rem;
+  }
+}
+
+/* ============= Estilos para el Modal de Video VR/XR =============== */
+.video-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.9);
+  display: none; /* Oculto por defecto */
+  align-items: center;
+  justify-content: center;
+  z-index: 2000; /* Asegura que esté por encima de todo */
+}
+
+.video-modal-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px; /* Espacio entre el video y el texto */
+}
+
+.video-wrapper {
+  position: relative;
+  width: 90vw; /* Ancho relativo a la ventana */
+  max-width: 800px;
+  background: #000;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  overflow: hidden;
+}
+
+.video-modal-close {
+  position: absolute;
+  top: -40px; /* Posicionado fuera del contenedor de video */
+  right: 0;
+  width: 35px;
+  height: 35px;
+  font-size: 28px;
+  font-weight: 300;
+  color: #fff;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, color 0.2s;
+  z-index: 2001; /* Asegura que el botón esté por encima */
+}
+
+.video-modal-close:hover {
+  transform: scale(1.1);
+  color: #aaa;
+}
+
+.video-modal-action {
+  text-align: center;
+}
+
+.demo-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 0 24px;
+  height: 50px;
+  border: none;
+  border-radius: 54px;
+  /* --- Liquid Glass Effect --- */
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(25px) saturate(180%) brightness(1.1);
+  -webkit-backdrop-filter: blur(25px) saturate(180%) brightness(1.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    /* Sombra externa suave */
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    /* Reflejo superior izquierdo interno */
+    inset 2px 2px 4px rgba(255, 255, 255, 0.4),
+    /* Reflejo inferior derecho interno */
+    inset -2px -2px 4px rgba(255, 255, 255, 0.15),
+    /* Borde interno sutil */
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-size: 1rem;
+  font-family: 'Avenir', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
+  position: relative;
+  z-index: 3;
+  overflow: visible;
+}
+
+.demo-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  transform: scale(1.02);
+  box-shadow:
+    /* Sombra externa más intensa */
+    0 12px 40px rgba(0, 0, 0, 0.18),
+    /* Reflejo superior izquierdo más prominente */
+    inset 3px 3px 6px rgba(255, 255, 255, 0.5),
+    /* Reflejo inferior derecho más sutil */
+    inset -3px -3px 6px rgba(255, 255, 255, 0.2),
+    /* Borde interno más brillante */
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+}
+
+/* Efecto liquid glass con gradiente sutil */
+.demo-button::before {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border-radius: 53px;
+  z-index: -1;
+  background: linear-gradient(145deg, 
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 30%,
+    rgba(255, 255, 255, 0.02) 70%,
+    rgba(255, 255, 255, 0.08) 100%);
+  pointer-events: none;
+}
+
+/* Ajuste para que el contenido del botón esté por encima */
+.demo-button > * {
+  position: relative;
+  z-index: 1;
+}
+
+.demo-description {
+  text-align: center;
+  margin-top: 0px;
+  max-width: 300px;
+}
+
+.demo-description p {
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-family: 'Avenir', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 400;
+  line-height: 1.4;
+  margin: 0;
+  opacity: 0.9;
+}
+
+
+/* ================= Banner QR Desktop ================= */
+.qr-banner {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  padding: 12px 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px 18px 0 0;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-width: 90vw;
+}
+
+.qr-banner .qr-image {
+  width: 160px;
+  max-width: 60vw;
+  height: auto;
+  margin-bottom: 8px;
+  user-select: none;
+  border-radius: 11px;
+}
+
+.qr-banner p {
+  margin: 0;
+  font-size: 0.95rem;
+  text-align: center;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+}
+
+/* Ocultar QR en dispositivos móviles o pantallas pequeñas */
+@media (max-width: 767px), (pointer: coarse) {
+  .qr-banner {
+    display: none;
+  }
+}
+/* ===================================================== */ 
+
+/* Espacio para QR banner en desktop para que no se superponga al contenido principal */
+@media (min-width: 768px) and (pointer: fine) {
+  body {
+    padding-bottom: 220px; /* igual o mayor que la altura del banner */
+  }
+} 

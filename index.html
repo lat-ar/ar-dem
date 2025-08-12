@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Demo WebAR | LatAR </title>
+  <!-- ===== Meta etiquetas para previsualización al compartir en redes ===== -->
+  <!-- Cambia el valor de og:image/twitter:image cuando quieras actualizar la miniatura -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Demo WebAR | LatAR">
+  <meta property="og:description" content="Experimenta, brazo robótico en Realidad Aumentada.">
+  <meta property="og:url" content="https://ar-dem.netlify.app/">
+  <meta property="og:image" content="2d/card3.webp">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Demo WebAR | LatAR">
+  <meta name="twitter:description" content="Experimenta nuestro brazo robótico en Realidad Aumentada.">
+  <meta name="twitter:image" content="2d/card3.webp">
+  <!-- ================================================================ -->
+  <link rel="icon" type="image/webp" href="2d/favicon.webp">
+  <!-- Mejora de rendimiento: establece conexión temprana con el CDN -->
+  <link rel="preconnect" href="https://unpkg.com" crossorigin>
+  <link rel="stylesheet" href="styles.css">
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+</head>
+<body>
+  <div class="sheet">
+    <!-- Logo en la parte superior centrado -->
+    <div class="logo-container">
+      <img src="2d/logo-latar.svg" alt="LatAR" class="logo">
+    </div>
+    <!-- Botón de contacto en la esquina superior izquierda -->
+    <div class="contact-button-container">
+      <button class="contact-button" id="contact-btn" aria-label="Contactar">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#4754c8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="16" x2="12" y2="12"></line>
+          <line x1="12" y1="8" x2="12.01" y2="8"></line>
+        </svg>
+      </button>
+      <!-- Menú desplegable -->
+      <div class="contact-menu" id="contact-menu">
+        <div class="contact-option" data-action="whatsapp">
+          <div class="contact-icon">
+            <svg viewBox="0 0 32 32" width="20" height="20" fill="#25D366">
+              <path d="M16.013 2.667c7.363 0 13.333 5.97 13.333 13.333 0 7.362-5.97 13.333-13.333 13.333-2.353 0-4.676-.61-6.71-1.768L2.667 29.333l2.8-6.54A13.248 13.248 0 0 1 2.68 16C2.68 8.637 8.65 2.667 16.013 2.667Zm0 2.666c-5.888 0-10.667 4.778-10.667 10.667 0 2.35.75 4.55 2.024 6.334l.32.455-1.66 3.88 4.02-1.67.45.267a10.58 10.58 0 0 0 5.513 1.55c5.888 0 10.667-4.778 10.667-10.666 0-5.889-4.779-10.667-10.667-10.667Zm5.63 14.737c-.248.7-1.452 1.368-2.013 1.452-.516.076-1.232.108-2.006-.126-.463-.144-1.05-.34-1.8-.666-3.168-1.375-5.238-4.527-5.396-4.74-.152-.213-1.285-1.71-1.285-3.264 0-1.553.81-2.31 1.096-2.63.285-.317.628-.397.836-.397.205 0 .41.002.59.011.19.009.444-.072.696.535.248.595.84 2.058.913 2.208.07.15.117.324.023.524-.096.205-.144.331-.283.51-.144.176-.304.395-.434.53-.14.143-.28.3-.12.59.152.295.679 1.123 1.46 1.828 1.01.903 1.867 1.185 2.156 1.326.285.14.45.119.61-.072.158-.19.7-.82.885-1.103.177-.285.355-.238.593-.143.24.094 1.55.73 1.816.864.267.128.44.19.505.297.069.107.069.645-.18 1.345Z"/>
+            </svg>
+          </div>
+          <span>WhatsApp</span>
+        </div>
+        <div class="contact-option" data-action="email">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#4754c8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m4 4 16 0 0 16-16 0z"></path>
+              <path d="m4 6 8 6 8-6"></path>
+            </svg>
+          </div>
+          <span>Mail</span>
+        </div>
+        <div class="contact-option" data-action="website">
+          <div class="contact-icon">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#4754c8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path d="m12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+            </svg>
+          </div>
+          <span>Website</span>
+        </div>
+        <div class="contact-option" data-action="show-vr">
+            <div class="contact-icon">
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#4754c8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12.5C2 9.46 4.46 7 7.5 7h9c3.04 0 5.5 2.46 5.5 5.5v0c0 3.04-2.46 5.5-5.5 5.5h-9C4.46 18 2 15.54 2 12.5v0z"></path>
+                    <path d="M12 18V7"></path>
+                </svg>
+            </div>
+            <span>VR/XR</span>
+        </div>
+      </div>
+    </div>
+    <div class="model-viewer-container">
+      <model-viewer 
+        id="main-model"
+        src="modelos3D/brazoRob.glb"
+        ios-src="modelos3D/brazoB.usdz#custom=https://bann-er.netlify.app//&customHeight=small"
+        poster="modelos3D/brazoRob.webp"
+        ar
+        ar-modes="webxr scene-viewer quick-look fallback"
+        ar-scale="auto"
+        camera-controls
+        loading="lazy"
+        preload="auto"
+        poster="https://modelviewer.dev/shared-assets/models/Astronaut.webp"
+        shadow-intensity="1"
+        auto-rotate
+        quick-look-browsers="safari chrome"
+        interaction-prompt="none"
+        ar-placement="floor"
+        class="model-viewer-bg">
+        <!-- Botones de acción para AR (solo visibles en WebXR) -->
+        <div id="ar-actions">
+          <button class="action-button" id="ar-info-btn" aria-label="Información">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+          </button>
+          <button class="action-button" id="ar-wa-btn" aria-label="WhatsApp">
+            <svg viewBox="0 0 32 32" width="20" height="20" fill="#25D366">
+              <path d="M16.013 2.667c7.363 0 13.333 5.97 13.333 13.333 0 7.362-5.97 13.333-13.333 13.333-2.353 0-4.676-.61-6.71-1.768L2.667 29.333l2.8-6.54A13.248 13.248 0 0 1 2.68 16C2.68 8.637 8.65 2.667 16.013 2.667Zm0 2.666c-5.888 0-10.667 4.778-10.667 10.667 0 2.35.75 4.55 2.024 6.334l.32.455-1.66 3.88 4.02-1.67.45.267a10.58 10.58 0 0 0 5.513 1.55c5.888 0 10.667-4.778 10.667-10.666 0-5.889-4.779-10.667-10.667-10.667Zm5.63 14.737c-.248.7-1.452 1.368-2.013 1.452-.516.076-1.232.108-2.006-.126-.463-.144-1.05-.34-1.8-.666-3.168-1.375-5.238-4.527-5.396-4.74-.152-.213-1.285-1.71-1.285-3.264 0-1.553.81-2.31 1.096-2.63.285-.317.628-.397.836-.397.205 0 .41.002.59.011.19.009.444-.072.696.535.248.595.84 2.058.913 2.208.07.15.117.324.023.524-.096.205-.144.331-.283.51-.144.176-.304.395-.434.53-.14.143-.28.3-.12.59.152.295.679 1.123 1.46 1.828 1.01.903 1.867 1.185 2.156 1.326.285.14.45.119.61-.072.158-.19.7-.82.885-1.103.177-.285.355-.238.593-.143.24.094 1.55.73 1.816.864.267.128.44.19.505.297.069.107.069.645-.18 1.345Z"/>
+            </svg>
+          </button>
+        </div>
+        <!-- Modal de información para AR -->
+        <div id="info-modal">
+          <div class="modal-content">
+            <button class="modal-close" id="modal-close-button">&times;</button>
+            <h3>Información del Producto</h3>
+            <p>Este es un brazo robótico de alta precisión diseñado para aplicaciones industriales avanzadas. Cuenta con tecnología de última generación que permite movimientos suaves y precisos para tareas de automatización complejas.</p>
+            <p>Características principales:</p>
+            <ul>
+              <li>6 ejes de movimiento</li>
+              <li>Precisión de ±0.02mm</li>
+              <li>Capacidad de carga: 500kg</li>
+              <li>Alcance máximo: 850mm</li>
+            </ul>
+          </div>
+        </div>
+      </model-viewer>
+      <div class="custom-loader" id="custom-loader"></div>
+    </div>
+    <div class="info-card">
+      <div class="info-text">
+        <h2>Simulación #AR41V-3</h2>
+        <p>Movimiento robótico de alta precisión diseñado para aplicaciones industriales avanzadas.</p>
+      </div>
+      <div class="info-actions">
+        <button class="ar-button" id="ar-launch">
+          <span class="ar-icon">
+            <!-- SVG de icono AR -->
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="3" y="7" width="18" height="10" rx="5" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="12" cy="12" r="3" stroke="#ffffff" stroke-width="2"/>
+            </svg>
+          </span>
+          <span>Realidad Aumentada</span>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- Banner QR para usuarios de escritorio -->
+  <div class="qr-banner" id="qr-banner">
+    <img src="2d/qr.webp" alt="Código QR" class="qr-image" />
+    <p>Parece que estas en una computadora, escanea el codigo QR para ver en Realidad Aumentada</p>
+  </div>
+  <!-- Fin banner QR -->
+
+  <!-- Modal para video VR/XR -->
+  <div id="vr-video-modal" class="video-modal-overlay">
+    <div class="video-modal-container">
+      <button id="close-vr-video-modal" class="video-modal-close">&times;</button>
+      <div class="video-wrapper">
+        <div style="padding:56.25% 0 0 0;position:relative;"><iframe src="https://player.vimeo.com/video/997951721?title=0&amp;byline=0&amp;portrait=0&amp;badge=0&amp;autopause=0&amp;player_id=0&amp;app_id=58479" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media; web-share" referrerpolicy="strict-origin-when-cross-origin" style="position:absolute;top:0;left:0;width:100%;height:100%;" title="Realidad aumentada en Puebla"></iframe></div><script src="https://player.vimeo.com/api/player.js"></script>
+      </div>
+      <div class="video-modal-action">
+        <a href="https://share.hsforms.com/1TTopCVSxShCsg3Q2uLqt8Ankmo9" target="_blank" class="demo-button">
+          <svg class="demo-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#f1f1f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          <span>Agenda tu Demo</span>
+        </a>
+      </div>
+      <div class="demo-description">
+        <p>Te visitamos para mostrarte cómo VR/XR mejora la capacitación, reduce tiempos y riesgos.</p>
+      </div>
+    </div>
+  </div>
+
+  <script defer type="text/javascript">
+    const onQuickLookButtonTapped = (event) => {
+      window.location.assign("https://wa.link/my0crk");
+    };
+    document
+      .querySelector("model-viewer")
+      .addEventListener("quick-look-button-tapped", onQuickLookButtonTapped);
+  </script>
+  <script defer type="text/javascript">
+    const linkElement = document.getElementById("ar-link");
+    linkElement.addEventListener(
+      "message",
+      function (event) {
+        if (event.data == "_apple_ar_quicklook_button_tapped") {
+          window.location.href = "https://wa.link/my0crk";
+        }
+      },
+      false
+    );
+  </script>
+  <!-- Cargar JS propio sin bloquear el hilo principal -->
+  <script defer src="app.js"></script>
+</body>
+</html> 
